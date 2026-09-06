@@ -1,0 +1,33 @@
+# Ablation: Effort SVD adaptation only (no GenD losses, no artifact branch).
+# Smallest, lowest-risk change vs upstream MIDS -- isolates the SVD contribution.
+
+dim: 768
+image_model_path: models/clip-vit-large-patch14-336
+text_model_path: models/t5-base
+samples_per_image: 3
+num_classes: 4
+
+clip_adapt: svd
+svd_target_last_layers: 6
+svd_targets: [self_attn.out_proj]
+svd_residual_rank: 16
+tune_layer_norm: true
+
+artifact_enabled: false
+
+ce_weight: 1.0
+ce_class_weights: null
+alignment_weight: 0.0
+uniformity_weight: 0.0
+artifact_mil_weight: 0.0
+query_orth_weight: 0.0
+svd_orth_weight: 0.01
+svd_keep_weight: 0.001
+
+train_data_path: null
+val_data_path: null
+epochs: 2
+batch_size: 24
+lr: 1.0e-4
+amp_dtype: bf16
+output_dir: runs/mids_svd_only

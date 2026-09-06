@@ -1,0 +1,33 @@
+# Baseline: reproduce upstream MIDS as closely as possible inside this codebase.
+# CLIP adapted by unfreezing the last 2 transformer layers; no GenD losses; no artifact branch;
+# 6 fusion tokens. Use this for an apples-to-apples comparison against mids_pp.yaml.
+# (An upstream FFAA mids.pth can be loaded into this configuration for direct comparison.)
+
+dim: 768
+image_model_path: models/clip-vit-large-patch14-336
+text_model_path: models/t5-base
+samples_per_image: 3
+num_classes: 4
+
+clip_adapt: unfreeze
+unfreeze_vision_last_layers: 2
+tune_layer_norm: false
+
+artifact_enabled: false
+
+ce_weight: 1.0
+ce_class_weights: null
+alignment_weight: 0.0
+uniformity_weight: 0.0
+artifact_mil_weight: 0.0
+query_orth_weight: 0.0
+svd_orth_weight: 0.0
+svd_keep_weight: 0.0
+
+train_data_path: null
+val_data_path: null
+epochs: 2
+batch_size: 24
+lr: 1.0e-4
+amp_dtype: bf16
+output_dir: runs/mids_original

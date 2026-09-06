@@ -1,0 +1,55 @@
+# MIDS++ full configuration: Effort SVD + GenD losses + ForensicsAdapter artifact token.
+# This is the recommended setup. Point image_model_path/text_model_path at the same CLIP/T5
+# weights your FFAA install uses (symlink ./models or override with --set).
+
+dim: 768
+image_model_path: models/clip-vit-large-patch14-336
+text_model_path: models/t5-base
+samples_per_image: 3
+num_classes: 4
+
+# --- CLIP adaptation: Effort SVD residual adapters (replaces "unfreeze last 2 layers") ---
+clip_adapt: svd
+svd_target_last_layers: 6
+svd_targets: [self_attn.out_proj]
+svd_residual_rank: 16
+tune_layer_norm: true
+
+# --- ForensicsAdapter-style local artifact branch ---
+artifact_enabled: true
+artifact_num_queries: 4
+artifact_num_heads: 8
+
+# --- losses ---
+ce_weight: 1.0
+ce_class_weights: null        # e.g. [1.0, 1.0, 1.0, 1.0]; their newfmt experiments tried [1,1,7,1]
+label_smoothing: 0.0
+alignment_weight: 0.5         # GenD
+uniformity_weight: 0.5        # GenD
+uniformity_t: 2.0
+artifact_mil_weight: 0.3      # ForAda weak MIL
+artifact_topk_fraction: 0.15
+artifact_real_weight: 0.5
+artifact_sparsity_weight: 0.05
+query_orth_weight: 0.05
+svd_orth_weight: 0.01         # Effort
+svd_keep_weight: 0.001        # Effort
+
+# --- data (override with --set train_data_path=... val_data_path=...) ---
+train_data_path: null
+val_data_path: null
+image_size: 336
+augment: true
+
+# --- optimisation ---
+epochs: 2
+batch_size: 24
+val_batch_size: 12
+lr: 1.0e-4
+weight_decay: 1.0e-5
+warmup_ratio: 0.03
+grad_clip: 1.0
+amp_dtype: bf16
+num_workers: 8
+seed: 0
+output_dir: runs/mids_pp

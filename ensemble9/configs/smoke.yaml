@@ -1,0 +1,37 @@
+# Tiny CPU smoke configuration. Uses random stand-in encoders (no T5/CLIP download) and small
+# tensors so the FULL pipeline -- SVD replacement, artifact head, fusion, all losses, backward,
+# selector, checkpoint save/load -- runs in seconds on CPU. NEVER use stub_encoders for training.
+
+stub_encoders: true
+stub_image_layers: 2
+stub_text_vocab: 256
+
+dim: 768
+samples_per_image: 3
+num_classes: 4
+
+clip_adapt: svd
+svd_target_last_layers: 2
+svd_targets: [self_attn.out_proj]
+svd_residual_rank: 4
+tune_layer_norm: true
+
+artifact_enabled: true
+artifact_num_queries: 4
+
+alignment_weight: 0.5
+uniformity_weight: 0.5
+artifact_mil_weight: 0.3
+query_orth_weight: 0.05
+svd_orth_weight: 0.01
+svd_keep_weight: 0.001
+
+image_size: 64
+augment: false
+epochs: 1
+batch_size: 4
+val_batch_size: 4
+lr: 1.0e-4
+amp_dtype: none
+num_workers: 0
+output_dir: runs/smoke
